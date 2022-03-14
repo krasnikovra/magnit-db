@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "dbadmin/bootstrapcss.html" %}
+    <title>Выгрузка данных</title>
+  </head>
+  <body>
+    {% include "dbadmin/bootstrapjs.html" with frompage="download" %}
+    {% include "dbadmin/navbar.html" with frompage="download" %}
+    <div class="filters">
+      <form action="{% url 'dbadmin:download' %}">
+        <div class="container-fluid my-3">
+        <div class="row align-items-end">
+        {% for filter, model, objects, verbosename, GET in Models %}
+        <div class="col">
+        <div class="m-2" style="text-align:center">{{ verbosename }}</div>
+          <select class="form-select" multiple size="5" name="{{ filter }}" id="{{ filter }}">
+            {% for obj in objects %}
+              {% if obj.id in GET %}
+                <option selected value="{{ obj.id }}">{{ obj.name }}</option>
+              {% else %}
+                <option value="{{ obj.id }}">{{ obj.name }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+        {% endfor %}
+        <div class="col align-self-end">
+          <input formaction="{% url 'dbadmin:download' %}" class="btn btn-primary my-2" type="submit" value="Применить фильтры">
+          <input formaction="{% url 'dbadmin:export' %}" class="btn btn-primary my-2" type="submit" value="Экспорт в файл Excel">
+        </div>
+        </div>
+        </div>
+      </form>
+    </div>
+    <!-- table-to-upload preview -->
+    {% if workers %}
+        <table class="table my-3 mx-auto">
+          <thead align="center"> 
+            <tr class="table-dark">
+                <th>№ п/п</th><th>ID</th></tj><th>ФИО</th><th>Номер рабочего телефона</th><th>Номер сотового телефона</th><th>Дирекция</th><th>Департамент</th><th>Служба</th><th>Отдел</th><th>Должность</th>
+            </tr>
+          </thead>
+          <tbody align="center">
+            {% for worker in workers %}
+            <tr>
+                <td>{{ forloop.counter }}</td><td>{{ worker.pk }}</td><td>{{ worker.full_name }}</td><td>{{ worker.work_phone }}</td><td>{{ worker.cell_phone }}</td><td>{{ worker.directory.name }}</td>
+                <td>{{ worker.department.name }}</td><td>{{ worker.service.name }}</td><td>{{ worker.branch.name }}</td><td>{{ worker.position.name }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    {% else %}
+        <div style="text-align:center">Работники отсутствуют</div>
+    {% endif %}
+  </body>
+</html>

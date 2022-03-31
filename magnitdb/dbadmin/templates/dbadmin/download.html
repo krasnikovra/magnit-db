@@ -5,11 +5,11 @@
     <title>Выгрузка данных</title>
   </head>
   <body>
-    {% include "dbadmin/bootstrapjs.html" with frompage="download" %}
+    {% include "dbadmin/bootstrapjs.html" %}
     {% include "dbadmin/navbar.html" with frompage="download" %}
-    <div class="filters">
+    <div class="filters mx-auto w-100">
       <form action="{% url 'dbadmin:download' %}">
-        <div class="container-fluid my-3">
+        <div class="container-fluid my-3 mx-5">
         <div class="row align-items-end">
         {% for filter, model, objects, verbosename, GET in Models %}
         <div class="col">
@@ -26,8 +26,8 @@
         </div>
         {% endfor %}
         <div class="col align-self-end">
-          <input formaction="{% url 'dbadmin:download' %}" class="btn btn-primary my-2" type="submit" value="Применить фильтры">
-          <input formaction="{% url 'dbadmin:export' %}" class="btn btn-primary my-2" type="submit" value="Экспорт в файл Excel">
+          <input formaction="{% url 'dbadmin:download' %}" class="btn btn-primary my-2 mx-3" type="submit" value="Применить фильтры">
+          <input formaction="{% url 'dbadmin:export' %}" class="btn btn-primary my-2 mx-3" type="submit" value="Экспорт в файл Excel">
         </div>
         </div>
         </div>

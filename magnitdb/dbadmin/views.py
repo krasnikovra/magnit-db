@@ -1,6 +1,7 @@
 from django.template.defaulttags import register
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import loader
+from django.urls import reverse
 from .models import *
 from openpyxl import Workbook
 from datetime import datetime
@@ -14,6 +15,7 @@ filters = [
     'branch_id',
     'position_id',
 ]
+
 models = [
     Directory, 
     Department, 
@@ -34,6 +36,7 @@ def download(request):
     # {
     #   'directory_id__in': request.GET.getlist('directory_id')
     # }
+
     args = {}
     for filter in filters:
         args[filter + '__in'] = request.GET.getlist(filter)
@@ -108,3 +111,157 @@ def export(request):
     workbook.save(response)
 
     return response
+
+
+def _dispatch_model(model):
+    if model == "directory":
+        label_text = "Название дирекции"
+        verbose_name = "Дирекция" 
+        verbose_name_whom = "Дирекцию"
+        plural_postfix = "а" #  postfix for the "добавлен" word
+        type = Directory
+    elif model == "department":
+        label_text = "Название департамента"
+        verbose_name = "Департамент"
+        verbose_name_whom = "Департамент"
+        plural_postfix = ""
+        type = Department
+    elif model == "service":
+        label_text = "Название Службы/Направления/Управления"
+        verbose_name = "Служба/Направление/Управление"
+        verbose_name_whom = "Службу/Направление/Управление"
+        plural_postfix = "а(-о)"
+        type = Service
+    elif model == "branch":
+        label_text = "Название отдела"
+        verbose_name = "Отдел"
+        verbose_name_whom = "Отдел"
+        plural_postfix = ""
+        type = Branch
+    elif model == "position":
+        label_text = "Название должности"
+        verbose_name = "Должность"
+        verbose_name_whom = "Должность"
+        plural_postfix = "а"
+        type = Position
+    else:
+        raise Http404()
+    return label_text, verbose_name, verbose_name_whom, plural_postfix, type
+
+was_add_succ = False
+last_obj_was_add = ""
+
+def add(request, model):
+    global was_add_succ, last_obj_was_add
+    main_view = "add_" + model
+
+    label_text, verbose_name, verbose_name_whom, plural_postfix, type = _dispatch_model(model)
+
+    template = loader.get_template('dbadmin/add_generic.html')
+    context = {
+        'whom': verbose_name_whom,
+        'mainview': main_view,
+        'model': model,
+        'labeltext': label_text,
+    }
+
+    if was_add_succ:
+        context['msg'] = f"{verbose_name} \"{last_obj_was_add}\" успешно добавлен{plural_postfix}."
+        context['err'] = False
+        was_add_succ = False
+
+    return HttpResponse(template.render(context, request))
+
+
+def add_save(request, model):
+    global was_add_succ, last_obj_was_add
+    main_view = "add_" + model
+
+    label_text, verbose_name, verbose_name_whom, plural_postfix, type = _dispatch_model(model)
+
+    name = request.POST.get('name', None)
+    template = loader.get_template('dbadmin/add_generic.html')
+
+    if name is None:
+        raise Http404()
+
+    if name == "":
+        context = {
+            'whom': verbose_name_whom,
+            'mainview': main_view,
+            'model': model,
+            'labeltext': label_text,
+            'msg': f"Произошла ошибка: поле \"{label_text}\" пусто.",
+            'err': True
+        }
+        return HttpResponse(template.render(context, request))
+
+    obj = type(name=name)
+    obj.save()
+
+    was_add_succ = True
+    last_obj_was_add = obj.name
+
+    return HttpResponseRedirect(reverse('dbadmin:add', args=[model]))
+
+was_delete_succ = False
+last_obj_was_delete = ""
+
+def delete(request, model):
+    global was_delete_succ, last_obj_was_add
+    main_view = "delete_" + model
+
+    label_text, verbose_name, verbose_name_whom, plural_postfix, type = _dispatch_model(model)
+
+    template = loader.get_template('dbadmin/delete_generic.html')
+
+    context = {
+        'whom': verbose_name_whom,
+        'mainview': main_view,
+        'model': model,
+        'labeltext': label_text,
+        'objects': type.objects.all()
+    }
+
+    if was_delete_succ:
+        context['msg'] = f"{verbose_name} \"{last_obj_was_delete}\" успешно удален{plural_postfix}."
+        context['err'] = False
+        was_delete_succ = False
+
+    return HttpResponse(template.render(context, request))
+
+
+def delete_save(request, model):
+    global was_delete_succ, last_obj_was_delete
+    main_view = "delete_" + model
+
+    label_text, verbose_name, verbose_name_whom, plural_postfix, type = _dispatch_model(model)
+
+    obj_id = request.POST.get('objid', None)
+    template = loader.get_template('dbadmin/delete_generic.html')
+
+    if obj_id is None:
+        raise Http404()
+
+    context = {
+        'whom': verbose_name_whom,
+        'mainview': main_view,
+        'model': model,
+        'labeltext': label_text,
+        'objects': type.objects.all()
+    }
+
+    obj = type.objects.get(pk=obj_id)
+    kwargs = {}
+    kwargs[model + '_id'] = obj_id
+    if Worker.objects.filter(**kwargs):
+        context['msg'] = 'Существуют работники, для которых ' + verbose_name + " - " + obj.name + "."
+        context['err'] = True
+        return HttpResponse(template.render(context, request))
+
+    obj.delete()
+
+    was_delete_succ = True
+    last_obj_was_delete = obj.name
+
+    return HttpResponseRedirect(reverse('dbadmin:delete', args=[model]))   

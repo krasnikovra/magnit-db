@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "dbadmin/bootstrapcss.html" %}
+    <title>Добавить {{ whom }}</title>
+  </head>
+  <body>
+    {% include "dbadmin/bootstrapjs.html" %}
+    {% include "dbadmin/navbar.html" with frompage=mainview %}
+    <form action="{% url 'dbadmin:add_save' model %}" method="post">
+      {% csrf_token %}
+      <div class="w-50">
+        <div class="p-6 my-3 mx-5">
+          <label for="input" class="form-label">{{ labeltext }}</label>
+          <input type="text" class="form-control" name="name" id="name">
+        </div>
+        <div class="сontainer mx-5">
+          <div class="row align-items-center">
+            <div class="col-md-auto">
+              <button type="submit" class="btn btn-primary my-auto">Добавить</button>
+            </div>
+            {% if msg %}
+            <div class="col">
+              <span class="mx-3 my-auto {% if err %} text-danger {% else %} text-success {% endif %}">{{ msg }}</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </form>
+    
+  </body>
+</html>

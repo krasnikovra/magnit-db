@@ -1,3 +1,4 @@
+from argparse import MetavarTypeHelpFormatter
 from django.db import models
 
 # Create your models here.
@@ -14,7 +15,7 @@ class Department(models.Model):
         return self.name
 
 class Service(models.Model):
-    name = models.CharField('Служба/направление/управление', max_length=128)
+    name = models.CharField('Служба/Направление/Управление', max_length=128)
 
     def __str__(self):
         return self.name

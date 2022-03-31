@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "dbadmin/bootstrapcss.html" %}
+    <title>Удалить {{ whom }}</title>
+  </head>
+  <body>
+    {% include "dbadmin/bootstrapjs.html" %}
+    {% include "dbadmin/navbar.html" with frompage=mainview %}
+    <form action="{% url 'dbadmin:delete_save' model %}" method="post">
+      {% csrf_token %}
+      <div class="w-50">
+        <div class="p-6 my-3 mx-5">
+          <label for="select" class="form-label">{{ labeltext }}</label>
+            <select class="form-select" size="5" name="objid" id="objid">
+                {% for obj in objects %}
+                    <option value="{{ obj.id }}">{{ obj.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="сontainer mx-5">
+          <div class="row align-items-center">
+            <div class="col-md-auto">
+              <button type="submit" class="btn btn-primary my-auto">Удалить</button>
+            </div>
+            {% if msg %}
+            <div class="col">
+              <span class="mx-3 my-auto {% if err %} text-danger {% else %} text-success {% endif %}">{{ msg }}</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </form>
+    
+  </body>
+</html>

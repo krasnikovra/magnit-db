@@ -2,19 +2,21 @@
 <html>
   <head>
     {% include "dbadmin/bootstrapcss.html" %}
+    {% include "dbadmin/bootstrap-selectcss.html" %}
     <title>Выгрузка данных</title>
   </head>
   <body>
-    {% include "dbadmin/bootstrapjs.html" %}
     {% include "dbadmin/navbar.html" with frompage="download" %}
     <div class="filters mx-auto w-100">
-      <form action="{% url 'dbadmin:download' %}">
+      <form action="{% url 'dbadmin:download' %}" name="form" id="form">
         <div class="container-fluid my-3 mx-5">
         <div class="row align-items-end">
         {% for filter, model, objects, verbosename, GET in Models %}
         <div class="col">
-        <div class="m-2" style="text-align:center">{{ verbosename }}</div>
-          <select class="form-select" multiple size="5" name="{{ filter }}" id="{{ filter }}">
+        <div class="mx-auto my-2" style="text-align:center">{{ verbosename }}</div>
+          <select class="selectpicker" data-width="100%" data-live-search="true" data-live-search-placeholder="Поиск" multiple 
+          data-none-selected-text="Не выбрано" data-actions-box="true" data-select-all-text="Выделить все" data-deselect-all-text="Отменить выделение"
+          data-none-results-text="Ничего не найдено" data-selected-text-format="values" data-style="" data-style-base="form-control" name="{{ filter }}" id="{{ filter }}">
             {% for obj in objects %}
               {% if obj.id in GET %}
                 <option selected value="{{ obj.id }}">{{ obj.name }}</option>
@@ -53,5 +55,14 @@
     {% else %}
         <div style="text-align:center">Работники отсутствуют</div>
     {% endif %}
+
+    {% include "dbadmin/jquery.html" %}
+    {% include "dbadmin/bootstrapjs.html" %}
+    {% include "dbadmin/bootstrap-selectjs.html" %}
+    <script type="text/javascript">
+      $( function() {
+         $('.selectpicker').selectpicker();
+      })
+    </script>
   </body>
 </html>

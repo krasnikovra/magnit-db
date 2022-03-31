@@ -2,17 +2,19 @@
 <html>
   <head>
     {% include "dbadmin/bootstrapcss.html" %}
+    {% include "dbadmin/bootstrap-selectcss.html" %}
     <title>Удалить {{ whom }}</title>
   </head>
   <body>
-    {% include "dbadmin/bootstrapjs.html" %}
     {% include "dbadmin/navbar.html" with frompage=mainview %}
     <form action="{% url 'dbadmin:delete_save' model %}" method="post">
       {% csrf_token %}
-      <div class="w-50">
+      <div class="w-50" id="cont">
         <div class="p-6 my-3 mx-5">
-          <label for="select" class="form-label">{{ labeltext }}</label>
-            <select class="form-select" size="5" name="objid" id="objid">
+          <div class="mx-auto my-2" style="text-align:left">{{ labeltext }}</div>
+          <select class="selectpicker" data-width="100%" data-live-search="true" data-live-search-placeholder="Поиск" 
+          data-none-selected-text="Не выбрано" data-container="cont"
+          data-none-results-text="Ничего не найдено" data-selected-text-format="values" data-style="" data-style-base="form-control" name="objid" id="objid">
                 {% for obj in objects %}
                     <option value="{{ obj.id }}">{{ obj.name }}</option>
                 {% endfor %}
@@ -32,6 +34,13 @@
         </div>
       </div>
     </form>
-    
+    {% include "dbadmin/jquery.html" %}
+    {% include "dbadmin/bootstrapjs.html" %}
+    {% include "dbadmin/bootstrap-selectjs.html" %}
+    <script type="text/javascript">
+      $( function() {
+         $('.selectpicker').selectpicker();
+      })
+    </script>
   </body>
 </html>

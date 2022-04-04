@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "dbadmin/bootstrapcss.html" %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+    <title>Вход</title>
+  </head>
+  <body>
+    <h1 class="my-2">Вход</h1>
+    <div id="form_wrap">
+      <form id="form_login" action="{% url 'dbadmin:login_confirm' %}" method="post">
+        {% csrf_token %}
+        <div class="container input-group">
+          <div class="row">
+            <div class="col">
+              <input type="text" class="form-control mb-2" placeholder="Логин" aria-label="username" aria-describedby="user's login" name="username" id="username">
+              <input type="password" class="form-control mb-2" placeholder="Пароль" aria-label="password" aria-describedby="user's password" name="password" id="password">
+              <input type="submit" class="btn btn-primary" value="Войти">
+              {% if msg %}
+              <span class="mx-3 my-auto text-danger">{{ msg }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </form>
+    </div> 
+    {% include "dbadmin/bootstrapjs.html" %}
+  </body>
+</html>

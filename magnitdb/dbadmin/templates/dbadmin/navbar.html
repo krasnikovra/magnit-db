@@ -5,7 +5,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
+      <ul class="nav navbar-nav w-100 justify-content-start">
         <li class="nav-item">
         {% if frompage == 'download' %}
             <a class="nav-link active" href="{% url 'dbadmin:download' %}">Выгрузка данных</a>
@@ -80,6 +80,11 @@
             <li><a class="dropdown-item" href="{% url 'dbadmin:delete' 'position' %}">Должность</a></li>
             {% endif %}
           </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav mx-5 my-auto w-100 justify-content-end">
+        <li class="nav-item">
+           <a class="nav-link" href="{% url 'dbadmin:logout' %}">Выход</a>
         </li>
       </ul>
     </div>

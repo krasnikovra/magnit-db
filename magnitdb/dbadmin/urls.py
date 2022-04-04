@@ -10,4 +10,7 @@ urlpatterns = [
     path('add/<str:model>/save', views.add_save, name='add_save'),
     path('delete/<str:model>', views.delete, name='delete'),
     path('delete/<str:model>/save', views.delete_save, name='delete_save'),
+    path('login', views.login, name='login'),
+    path('login/confirm', views.login_confirm, name='login_confirm'),
+    path('logout', views.logout, name='logout'),
 ]

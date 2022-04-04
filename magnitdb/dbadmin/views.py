@@ -2,10 +2,16 @@ from django.template.defaulttags import register
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import loader
 from django.urls import reverse
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as djangologin
+from django.contrib.auth import logout as djangologout
+from django.contrib.auth.decorators import login_required
 from .models import *
 from openpyxl import Workbook
 from datetime import datetime
 from datetime import timedelta
+
+LOGIN_URL = 'dbadmin:login'
 
 # all possible filters
 filters = [
@@ -25,12 +31,14 @@ models = [
 ]
 
 
+@login_required
 def index(request):
     template = loader.get_template('dbadmin/index.html')
     context = {}
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def download(request):
     # collecting a dict of **kwargs which is something like
     # {
@@ -58,6 +66,7 @@ def download(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def export(request):
     # collecting a dict of **kwargs which is something like
     # {
@@ -127,7 +136,7 @@ def _dispatch_model(model):
         plural_postfix = ""
         type = Department
     elif model == "service":
-        label_text = "Название Службы/Направления/Управления"
+        label_text = "Название службы/направления/управления"
         verbose_name = "Служба/Направление/Управление"
         verbose_name_whom = "Службу/Направление/Управление"
         plural_postfix = "а(-о)"
@@ -151,6 +160,7 @@ def _dispatch_model(model):
 was_add_succ = False
 last_obj_was_add = ""
 
+@login_required
 def add(request, model):
     global was_add_succ, last_obj_was_add
     main_view = "add_" + model
@@ -173,6 +183,7 @@ def add(request, model):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def add_save(request, model):
     global was_add_succ, last_obj_was_add
     main_view = "add_" + model
@@ -207,6 +218,7 @@ def add_save(request, model):
 was_delete_succ = False
 last_obj_was_delete = ""
 
+@login_required
 def delete(request, model):
     global was_delete_succ, last_obj_was_add
     main_view = "delete_" + model
@@ -230,7 +242,7 @@ def delete(request, model):
 
     return HttpResponse(template.render(context, request))
 
-
+@login_required
 def delete_save(request, model):
     global was_delete_succ, last_obj_was_delete
     main_view = "delete_" + model
@@ -264,4 +276,39 @@ def delete_save(request, model):
     was_delete_succ = True
     last_obj_was_delete = obj.name
 
-    return HttpResponseRedirect(reverse('dbadmin:delete', args=[model]))   
+    return HttpResponseRedirect(reverse('dbadmin:delete', args=[model]))
+
+
+def login(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('dbadmin:index'))
+
+    template = loader.get_template('dbadmin/login.html')
+    context = {}
+    return HttpResponse(template.render(context, request))
+    
+
+def login_confirm(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('dbadmin:index'))
+
+    username = request.POST.get('username', None)
+    password = request.POST.get('password', None)
+    
+    user = authenticate(username=username, password=password)
+
+    if user is not None:
+        djangologin(request, user)
+        return HttpResponseRedirect(reverse('dbadmin:index'))
+
+    template = loader.get_template('dbadmin/login.html')
+    context = {
+        'msg': "Неверный логин или пароль."
+    }
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def logout(request):
+    djangologout(request)
+    return HttpResponseRedirect(reverse('dbadmin:login'))

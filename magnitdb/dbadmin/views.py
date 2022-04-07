@@ -1,4 +1,4 @@
-from django.template.defaulttags import register
+from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import loader
 from django.urls import reverse
@@ -9,9 +9,9 @@ from django.contrib.auth.decorators import login_required
 from .models import *
 from openpyxl import Workbook
 from datetime import datetime
-from datetime import timedelta
 
 LOGIN_URL = 'dbadmin:login'
+ROWS_A_PAGE = 2
 
 # all possible filters
 filters = [
@@ -50,18 +50,24 @@ def download(request):
         args[filter + '__in'] = request.GET.getlist(filter)
     # if some GET params are invalid we are aborting any filtering
     workers = Worker.objects.filter(**args).order_by('full_name')
-
-    # TODO: its quitely hard to pass 1bln table by http, so we must have some limit, i.e. first 1000 rows?
     
     verbose_names = [model._meta.get_field('name').verbose_name for model in models]
-    objects = [model.objects.all() for model in models]
+    objects = [model.objects.all().order_by('name') for model in models]
     GET = [list(map(int, request.GET.getlist(filter))) for filter in filters]
+
+    paginator = Paginator(workers, ROWS_A_PAGE) # Show 25 contacts per page.
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     template = loader.get_template('dbadmin/download.html')
     context = {
         'workers': workers,
         'Models': list(zip(filters, models, objects, verbose_names, GET)),
+        'page_obj': page_obj,
     }
+
+    print(request.build_absolute_uri())
 
     return HttpResponse(template.render(context, request))
 

@@ -1,0 +1,65 @@
+{% load index %}
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "dbadmin/bootstrapcss.html" %}
+    {% include "dbadmin/bootstrap-selectcss.html" %}
+    <title>Поиск сотрудника</title>
+  </head>
+  <body>
+    {% include "dbadmin/navbar.html" with frompage='search' %}
+    <div class="container-fluid w-100">
+    <div class="row">
+    <div class="col-md-3 ps-0">
+    <form class="mx-5" action="{% url 'dbadmin:search' %}", method="get", name="form", id="form">
+      <label for="full_name" class="form-label">ФИО сотрудника</label> 
+      <input type="text" class="form-control mb-3", placeholder="Введите ФИО сотрудника" value="{{ full_name }}" name="full_name", id="full_name">
+      <button class="btn btn-primary me-3 my-2" type="button" data-bs-toggle="collapse" href="#filters" role="button" aria-expanded="false" aria-controls="filters">Скрыть/показать фильтры</button>
+      <button type="submit" class="btn btn-primary my-2">Найти</button>
+      <div class="filters w-100 collapse {% if not collapse_filters %}show{% endif %}" id="filters">
+          <div class="container-fluid mt-3 mb-4 px-0">
+          <div class="row align-items-end">
+          {% for filter, model, objects, verbosename, GET in Models %}
+          <div class="mx-auto my-2" style="text-align:center">{{ verbosename }}</div>
+            <select class="selectpicker" data-width="100%" data-live-search="true" data-live-search-placeholder="Поиск" multiple 
+            data-none-selected-text="Не выбрано" data-actions-box="true" data-select-all-text="Выделить все" data-deselect-all-text="Отменить выделение"
+            data-none-results-text="Ничего не найдено" data-selected-text-format="values" data-style="" data-style-base="form-control" name="{{ filter }}" id="{{ filter }}">
+              {% for obj in objects %}
+                {% if obj.id in GET %}
+                  <option selected value="{{ obj.id }}">{{ obj.name }}</option>
+                {% else %}
+                  <option value="{{ obj.id }}">{{ obj.name }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          {% endfor %}
+          </div>
+          </div>
+      </div>
+    </form>
+    </div>
+    <div class="col-md-9">
+    {% if results_count > 0 %}
+    <p class="mx-5 my-3">Результатов поиска: {{ results_count }}</p>
+    {% endif %}
+    <ol class="list-group mx-5 mb-5 w-auto list-group-flush">
+      {% for worker, desc_values in page_obj %}
+      <li class="list-group-item">
+        <span>{{ page_obj.start_index|add:forloop.counter|add:"-1" }}. </span>
+        <a href="{% url 'dbadmin:profile' worker.id %}">{{ worker.full_name }}</a>
+        <div class="desc mx-4 my-2" style="font-size:80%;"> 
+          {{ desc_values|join:', ' }}
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+    {% include "dbadmin/pagination.html" with page_obj=page_obj %}
+    </div>
+    </div>
+    </div>
+    {% include "dbadmin/jquery.html" %}
+    {% include "dbadmin/bootstrapjs.html" %}
+    {% include "dbadmin/bootstrap-selectjs.html" %}
+    </div>
+  </body>
+</html>

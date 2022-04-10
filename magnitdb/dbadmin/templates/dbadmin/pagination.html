@@ -1,0 +1,29 @@
+{% load url_set_page %}
+{% if page_obj %}
+{% if page_obj.has_next or page_obj.has_previous %}
+<div class="pagination container-fluid justify-content-center">
+    <div class="row d-flex justify-content-center w-100 step-links">
+        <div class="col-4 d-flex justify-content-end">
+        {% if page_obj.has_previous %}
+          <a class="mx-3" href="?{% url_set_page 1 %}">&laquo; В начало</a>
+          <a class="mx-3" href="?{% url_set_page page_obj.previous_page_number %}">Назад <</a>
+        {% else %}
+          <a class="mx-3" hidden>&laquo; В начало</a>
+          <a class="mx-3" hidden>Назад <</a>
+        {% endif %}
+        </div>
+        <div class="col-md-auto d-flex justify-content-center">
+        <span class="current mx-3">
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+        </span>
+        </div>
+        <div class="col-4 d-flex justify-content-start">
+        {% if page_obj.has_next %}
+            <a class="mx-3" href="?{% url_set_page page_obj.next_page_number %}">Вперед ></a>
+            <a class="mx-3" href="?{% url_set_page page_obj.paginator.num_pages %}">В конец &raquo;</a>
+        {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endif %}

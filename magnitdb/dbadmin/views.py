@@ -10,8 +10,8 @@ from .models import *
 from openpyxl import Workbook
 from datetime import datetime
 
-LOGIN_URL = 'dbadmin:login'
-ROWS_A_PAGE = 2
+ROWS_A_PAGE_DOWNLOAD = 2
+ROWS_A_PAGE_SEARCH = 2
 
 # all possible filters
 filters = [
@@ -55,7 +55,7 @@ def download(request):
     objects = [model.objects.all().order_by('name') for model in models]
     GET = [list(map(int, request.GET.getlist(filter))) for filter in filters]
 
-    paginator = Paginator(workers, ROWS_A_PAGE) # Show 25 contacts per page.
+    paginator = Paginator(workers, ROWS_A_PAGE_DOWNLOAD)
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -66,8 +66,6 @@ def download(request):
         'Models': list(zip(filters, models, objects, verbose_names, GET)),
         'page_obj': page_obj,
     }
-
-    print(request.build_absolute_uri())
 
     return HttpResponse(template.render(context, request))
 
@@ -283,6 +281,63 @@ def delete_save(request, model):
     last_obj_was_delete = obj.name
 
     return HttpResponseRedirect(reverse('dbadmin:delete', args=[model]))
+
+
+@login_required
+def profile(request, worker_id):
+    try:
+        worker = Worker.objects.get(pk=worker_id)
+    except Worker.DoesNotExist:
+        raise Http404()
+    template = loader.get_template('dbadmin/profile.html')
+    models = [Position, Branch, Service, Department, Directory]
+    desc_labels = [model._meta.get_field('name').verbose_name for model in models]
+    desc_values = [getattr(worker, model.__name__.lower()).name for model in models]
+    desc = list(zip(desc_labels, desc_values))
+    context = {
+        'worker': worker,
+        'desc': desc
+    }
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def search(request):
+    kwargs = {}
+    full_name = request.GET.get('full_name', None)
+    workers_and_descs = []
+    page_obj = None
+    collapse_filters = True
+    if full_name is not None:
+        kwargs['full_name__icontains'] = full_name
+        for filter in filters:
+            filter_get = request.GET.getlist(filter)
+            if filter_get:
+                collapse_filters = False
+                kwargs[filter + '__in'] = request.GET.getlist(filter)
+        print(kwargs)
+        workers = Worker.objects.filter(**kwargs).order_by('full_name')
+        print(workers)
+        desc_values = [[getattr(worker, model.__name__.lower()).name for model in models][::-1] for worker in workers]
+        workers_and_descs = list(zip(workers, desc_values))
+
+        paginator = Paginator(workers_and_descs, ROWS_A_PAGE_SEARCH)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+    verbose_names = [model._meta.get_field('name').verbose_name for model in models]
+    objects = [model.objects.all().order_by('name') for model in models]
+    GET = [list(map(int, request.GET.getlist(filter))) for filter in filters]
+
+    template = loader.get_template("dbadmin/search.html")
+    context = {
+        'collapse_filters': collapse_filters,
+        'Models': list(zip(filters, models, objects, verbose_names, GET)),
+        'results_count': len(workers_and_descs),
+        'page_obj': page_obj,
+        'full_name': full_name if full_name is not None else ''
+    }
+    return HttpResponse(template.render(context, request))
 
 
 def login(request):

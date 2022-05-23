@@ -4,6 +4,10 @@
 
 ## Программное обеспечение
 
+Требуемые модули Python:
+  - django
+  - openpyxl
+
 Приложение написано на Django:
   - Официальный сайт проекта Django - https://www.djangoproject.com
   - Исходный код - https://github.com/django/django

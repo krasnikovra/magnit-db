@@ -14,9 +14,9 @@
         {% for filter, model, objects, verbosename, GET in Models %}
         <div class="col">
         <div class="mx-auto my-2" style="text-align:center">{{ verbosename }}</div>
-          <select class="selectpicker" data-width="100%" data-live-search="true" data-live-search-placeholder="Поиск" multiple 
+          <select class="selectpicker" data-width="100%" data-live-search="true" data-live-search-placeholder="Поиск" multiple data-count-selected-text="Выбрано элементов: {0}"
           data-none-selected-text="Не выбрано" data-actions-box="true" data-select-all-text="Выделить все" data-deselect-all-text="Отменить выделение"
-          data-none-results-text="Ничего не найдено" data-selected-text-format="values" data-style="" data-style-base="form-control" name="{{ filter }}" id="{{ filter }}">
+          data-none-results-text="Ничего не найдено" data-selected-text-format="count" data-style="" data-style-base="form-control" name="{{ filter }}" id="{{ filter }}">
             {% for obj in objects %}
               {% if obj.id in GET %}
                 <option selected value="{{ obj.id }}">{{ obj.name }}</option>
@@ -37,9 +37,6 @@
     </div>
     <!-- table-to-upload preview -->
     {% if page_obj %}
-        <div class="mx-auto">
-          Предпросмотр выгружаемых данных
-        </div>
         <table class="table table-bordered my-3 mx-auto">
           <thead align="center"> 
             <tr class="table-dark">
@@ -49,7 +46,7 @@
           <tbody align="center">
             {% for worker in page_obj %}
             <tr>
-                <td>{{ forloop.counter }}</td><td>{{ worker.pk }}</td><td>{{ worker.full_name }}</td><td>{{ worker.work_phone }}</td><td>{{ worker.cell_phone }}</td><td>{{ worker.directory.name }}</td>
+                <td>{{ page_obj.start_index|add:forloop.counter|add:"-1" }}</td><td>{{ worker.pk }}</td><td>{{ worker.full_name }}</td><td>{{ worker.work_phone }}</td><td>{{ worker.cell_phone }}</td><td>{{ worker.directory.name }}</td>
                 <td>{{ worker.department.name }}</td><td>{{ worker.service.name }}</td><td>{{ worker.branch.name }}</td><td>{{ worker.position.name }}</td>
             </tr>
             {% endfor %}

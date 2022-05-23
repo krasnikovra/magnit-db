@@ -1,0 +1,21 @@
+{% load index %}
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "dbadmin/bootstrapcss.html" %}
+    <title>Группа привилегий {{ group.name }} </title>
+  </head>
+  <body>
+    {% include "dbadmin/navbar.html" with frompage='undefined' %}
+    <div class="content mx-5 w-auto">
+      <h5 class="mb-3">В группу привилегий "{{ group.name }}" входят следующие привилегии</h5>
+      <ul class="my-2">
+          {% for perm in group.permissions.all %}
+          <li>{{ perm.name }}</li>
+          {% endfor %}
+      </ul>
+    </div>
+    {% include "dbadmin/jquery.html" %}
+    {% include "dbadmin/bootstrapjs.html" %}
+  </body>
+</html>

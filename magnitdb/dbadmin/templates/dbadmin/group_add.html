@@ -7,12 +7,30 @@
   <body>
     {% include "dbadmin/bootstrapjs.html" %}
     {% include "dbadmin/navbar.html" with frompage=mainview %}
-    <form action="{% url 'dbadmin:add_save' model %}" method="post">
+    <form action="{% url 'dbadmin:group_add_save' %}" method="post">
       {% csrf_token %}
       <div class="w-50">
         <div class="p-6 my-3 mx-5">
           <label for="input" class="form-label">{{ labeltext }}</label>
           <input type="text" class="form-control" placeholder="Введите {{ labeltext|lower }}" name="name" id="name">
+        </div>
+        <div class="p-6 my-3 mx-5">
+          <label for="perm_list" class="form-label">Укажите привилегии группы</label>
+          <ul class="list-group list-group-flush">
+          {% for model, permissions in model_permissions %}
+            <li class="list-group-item">
+                <label for="list{{ forloop.counter }}">{{ model }}</label>
+                <ul class="list-group ms-5 my-3" id="list{{ forloop.counter }}" name="list{{ forloop.counter }}">
+                {% for perm in permissions %}
+                <li class="list-group-item">
+                    <input type="checkbox" value="{{ perm.pk }}" id="perm_id_{{ perm_pk }}" name="perm_id">
+                    <label for="perm_id_{{ perm_pk }}">{{ perm.name }}</label>
+                </li>
+                {% endfor %}
+                </ul>
+            </li>
+          {% endfor %}
+          </ul>
         </div>
         <div class="сontainer mx-5">
           <div class="row align-items-center">

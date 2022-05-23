@@ -19,31 +19,48 @@
         {% for row in desc %}
         <tr><th scope="row">{{ row|index:0 }}:</th><td> {{ row|index:1 }}</td></tr>
         {% endfor %}
+        <tr><th scope="row">Группы привилегий:</th><td>
+          {% if worker.user.groups.all %}
+          <ul>
+            {% for group in worker.user.groups.all %}
+            <li><a href="{% url 'dbadmin:group' group.id %}">{{ group.name }}</a></li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          Нет групп привилегий
+          {% endif %}
+        </td></tr>
       </table>
-      {% include "dbadmin/jquery.html" %}
-      {% include "dbadmin/bootstrapjs.html" %}
-      <script>
-        function copyToClipboard(element, button) {
-          var $temp = $("<input>");
-          $("body").append($temp);
-          $temp.val($(element).text()).select();
-          document.execCommand("copy");
-          $temp.remove();
-
-          var $btn = $(button);
-          $btn.removeClass('btn-primary');
-          $btn.addClass('btn-success');
-          $btn.text('Скопировано');
-          $btn.prop('disabled', true);
-
-          setTimeout(function(){
-            $btn.removeClass('btn-success');
-            $btn.addClass('btn-primary');
-            $btn.text('Скопировать');
-            $btn.prop('disabled', false);
-          }, 1000)
-        }
-      </script>
+      {% if perms.dbadmin.edit_worker %}
+      <a href="{% url 'dbadmin:profile_edit' worker.id %}" class="btn btn-primary my-2 me-3">Изменить данные сотрудника</a>
+      {% endif %}
+      {% if perms.dbadmin.assign_group %}
+      <a href="{% url 'dbadmin:profile_assign_group' worker.id %}" class="btn btn-primary my-2">Назначить группы привилегий</a>
+      {% endif %}
     </div>
+    {% include "dbadmin/jquery.html" %}
+    {% include "dbadmin/bootstrapjs.html" %}
+    <script>
+      function copyToClipboard(element, button) {
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($(element).text()).select();
+        document.execCommand("copy");
+        $temp.remove();
+
+        var $btn = $(button);
+        $btn.removeClass('btn-primary');
+        $btn.addClass('btn-success');
+        $btn.text('Скопировано');
+        $btn.prop('disabled', true);
+
+        setTimeout(function(){
+          $btn.removeClass('btn-success');
+          $btn.addClass('btn-primary');
+          $btn.text('Скопировать');
+          $btn.prop('disabled', false);
+        }, 1000)
+      }
+    </script>
   </body>
 </html>

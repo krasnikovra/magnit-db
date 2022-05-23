@@ -2,22 +2,22 @@
 <html>
   <head>
     {% include "dbadmin/bootstrapcss.html" %}
-    <title>Добавить {{ whom|lower }}</title>
+    <title>Изменить номер</title>
   </head>
   <body>
     {% include "dbadmin/bootstrapjs.html" %}
-    {% include "dbadmin/navbar.html" with frompage=mainview %}
-    <form action="{% url 'dbadmin:add_save' model %}" method="post">
+    {% include "dbadmin/navbar.html" with frompage='changecellphone' %}
+    <form action="{% url 'dbadmin:changecellphone_save' %}" method="post">
       {% csrf_token %}
       <div class="w-50">
         <div class="p-6 my-3 mx-5">
-          <label for="input" class="form-label">{{ labeltext }}</label>
-          <input type="text" class="form-control" placeholder="Введите {{ labeltext|lower }}" name="name" id="name">
+          <label for="input" class="form-label">Новый номер сотового телефона</label>
+          <input type="text" class="form-control" placeholder="Введите новый номер сотового телефона" name="cellphone" id="cellphone">
         </div>
         <div class="сontainer mx-5">
           <div class="row align-items-center">
             <div class="col-md-auto">
-              <button type="submit" class="btn btn-primary my-auto">Добавить</button>
+              <button type="submit" class="btn btn-primary my-auto">Изменить</button>
             </div>
             {% if msg %}
             <div class="col">

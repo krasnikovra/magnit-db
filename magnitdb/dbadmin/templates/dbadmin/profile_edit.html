@@ -1,0 +1,59 @@
+{% load index %}
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "dbadmin/bootstrapcss.html" %}
+    {% include "dbadmin/bootstrap-selectcss.html" %}
+    <title>Изменить профиль сотрудника</title>
+  </head>
+  <body>
+    {% include "dbadmin/navbar.html" with frompage='undefined' %}
+    <div class="content mx-5 w-50">
+      <h1 class="mb-3">Профиль сотрудника</h1>
+      <form action="{% url 'dbadmin:profile_edit_save' worker.id %}" method="post">
+        {% csrf_token %}
+      <table class="table table-bordered">
+        <tr><th scope="row">ID:</th><td class="col-md-6"> {{ worker.id }}</td></tr>
+        <tr><th scope="row">ФИО:</th><td class="col-md-6"> 
+            <input type="text" class="form-control" placeholder="ФИО" name="full_name" id="full_name" value="{{ worker.full_name }}">
+        </td></tr>
+        <tr><th scope="row">Номер рабочего телефона:</th><td class="col-md-4">
+            <input type="text" class="form-control" placeholder="Номер рабочего телефона" name="work_phone" id="work_phone" value="{{ worker.work_phone }}">
+        </td></tr>
+        <tr><th scope="row">Номер сотового телефона:</th><td  class="col-md-4">
+            <input type="text" class="form-control" placeholder="Номер сотового телефона" name="cell_phone" id="cell_phone" value="{{ worker.cell_phone }}">
+        </td></tr>
+        {% for label, filter, objects, current_obj_id in data %}
+        <tr><th scope="row">{{ label }}:</th><td>
+            <select class="selectpicker" data-width="100%" data-live-search="true" data-live-search-placeholder="Поиск" 
+            data-none-selected-text="Не выбрано" data-container="cont"
+            data-none-results-text="Ничего не найдено" data-selected-text-format="values" data-style="" data-style-base="form-control" name="{{ filter }}" id="{{ filter }}">
+                {% for obj in objects %}
+                    <option value="{{ obj.id }}" {% if obj.id == current_obj_id %} selected {% endif %}>{{ obj.name }}</option>
+                {% endfor %}
+          </select>
+        </td></tr>
+        {% endfor %}
+        <tr><th scope="row">Группы привилегий</th><td>
+            {% if worker.user.groups.all %}
+            <ul>
+              {% for group in worker.user.groups.all %}
+              <li>{{ group.name }}</li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            Нет групп привилегий
+            {% endif %}
+          </td></tr>
+      </table>
+      <input type="submit" class="btn btn-primary my-2" value="Сохранить">
+      {% if msg %}
+            <span class="mx-3 my-auto {% if err %} text-danger {% else %} text-success {% endif %}">{{ msg }}</span>
+      {% endif %}
+      </form>
+    </div>
+    {% include "dbadmin/jquery.html" %}
+    {% include "dbadmin/bootstrapjs.html" %}
+    {% include "dbadmin/bootstrap-selectjs.html" %}
+  </body>
+</html>

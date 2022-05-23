@@ -1,18 +1,28 @@
 {% load startswith %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light mx-3 my-3">
-    <a class="navbar-brand" href="{% url 'dbadmin:index' %}">magnit-db</a>
+    <a class="navbar-brand" href="{% url 'dbadmin:index' %}">База данных</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="nav navbar-nav w-100 justify-content-start">
         <li class="nav-item">
+          {% if frompage == 'changecellphone' %}
+              <a class="nav-link active" href="{% url 'dbadmin:changecellphone' %}">Изменить номер телефона</a>
+          {% else %}
+              <a class="nav-link" href="{% url 'dbadmin:changecellphone' %}">Изменить номер телефона</a>
+          {% endif %}
+        </li>
+        <li class="nav-item">
+        {% if perms.dbadmin.download_data %}
         {% if frompage == 'download' %}
             <a class="nav-link active" href="{% url 'dbadmin:download' %}">Выгрузка данных</a>
         {% else %}
             <a class="nav-link" href="{% url 'dbadmin:download' %}">Выгрузка данных</a>
         {% endif %}
+        {% endif %}
         </li>
+        {% if perms.dbadmin.add_directory or perms.dbadmin.add_department or perms.dbadmin.add_service or perms.dbadmin.add_branch or perms.dbadmin.add_position %}
         <li class="nav-item dropdown">
           {% if frompage|startswith:'add' %}
           <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownAdd" role="button" data-bs-toggle="dropdown" aria-expanded="false">Добавить</a>
@@ -20,33 +30,45 @@
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAdd" role="button" data-bs-toggle="dropdown" aria-expanded="false">Добавить</a>
           {% endif %}
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownAdd">
+            {% if perms.dbadmin.add_directory %}
             {% if frompage == 'add_directory' %}
             <li><a class="dropdown-item active" href="{% url 'dbadmin:add' 'directory' %}">Дирекцию</a></li>
             {% else %}
             <li><a class="dropdown-item" href="{% url 'dbadmin:add' 'directory' %}">Дирекцию</a></li>
             {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.add_department %}
             {% if frompage == 'add_department' %}
             <li><a class="dropdown-item active" href="{% url 'dbadmin:add' 'department' %}">Департамент</a></li>
             {% else %}
             <li><a class="dropdown-item" href="{% url 'dbadmin:add' 'department' %}">Департамент</a></li>
             {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.add_service %}
             {% if frompage == 'add_service' %}
             <li><a class="dropdown-item active" href="{% url 'dbadmin:add' 'service' %}">Службу/Направление/Управление</a></li>
             {% else %}
             <li><a class="dropdown-item" href="{% url 'dbadmin:add' 'service' %}">Службу/Направление/Управление</a></li>
             {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.add_branch %}
             {% if frompage == 'add_branch' %}
             <li><a class="dropdown-item active" href="{% url 'dbadmin:add' 'branch' %}">Отдел</a></li>
             {% else %}
             <li><a class="dropdown-item" href="{% url 'dbadmin:add' 'branch' %}">Отдел</a></li>
             {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.add_position %}
             {% if frompage == 'add_position' %}
             <li><a class="dropdown-item active" href="{% url 'dbadmin:add' 'position' %}">Должность</a></li>
             {% else %}
             <li><a class="dropdown-item" href="{% url 'dbadmin:add' 'position' %}">Должность</a></li>
             {% endif %}
+            {% endif %}
           </ul>
         </li>
+        {% endif %}
+        {% if perms.dbadmin.delete_directory or perms.dbadmin.delete_department or perms.dbadmin.delete_service or perms.dbadmin.delete_branch or perms.dbadmin.delete_position %}
         <li class="nav-item dropdown">
           {% if frompage|startswith:'delete' %}
           <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownDelete" role="button" data-bs-toggle="dropdown" aria-expanded="false">Удалить</a>
@@ -54,33 +76,91 @@
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownDelete" role="button" data-bs-toggle="dropdown" aria-expanded="false">Удалить</a>
           {% endif %}
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownDelete">
+            {% if perms.dbadmin.delete_directory %}
             {% if frompage == 'delete_directory' %}
             <li><a class="dropdown-item active" href="{% url 'dbadmin:delete' 'directory' %}">Дирекцию</a></li>
             {% else %}
             <li><a class="dropdown-item" href="{% url 'dbadmin:delete' 'directory' %}">Дирекцию</a></li>
             {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.delete_department %}
             {% if frompage == 'delete_department' %}
             <li><a class="dropdown-item active" href="{% url 'dbadmin:delete' 'department' %}">Департамент</a></li>
             {% else %}
             <li><a class="dropdown-item" href="{% url 'dbadmin:delete' 'department' %}">Департамент</a></li>
             {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.delete_service %}
             {% if frompage == 'delete_service' %}
             <li><a class="dropdown-item active" href="{% url 'dbadmin:delete' 'service' %}">Службу/Направление/Управление</a></li>
             {% else %}
             <li><a class="dropdown-item" href="{% url 'dbadmin:delete' 'service' %}">Службу/Направление/Управление</a></li>
             {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.delete_branch %}
             {% if frompage == 'delete_branch' %}
             <li><a class="dropdown-item active" href="{% url 'dbadmin:delete' 'branch' %}">Отдел</a></li>
             {% else %}
             <li><a class="dropdown-item" href="{% url 'dbadmin:delete' 'branch' %}">Отдел</a></li>
             {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.delete_position %}
             {% if frompage == 'delete_position' %}
             <li><a class="dropdown-item active" href="{% url 'dbadmin:delete' 'position' %}">Должность</a></li>
             {% else %}
             <li><a class="dropdown-item" href="{% url 'dbadmin:delete' 'position' %}">Должность</a></li>
             {% endif %}
+            {% endif %}
           </ul>
         </li>
+        {% endif %}
+        {% if perms.dbadmin.edit_directory or perms.dbadmin.edit_department or perms.dbadmin.edit_service or perms.dbadmin.edit_branch or perms.dbadmin.edit_position %}
+        <li class="nav-item dropdown">
+          {% if frompage|startswith:'edit' %}
+          <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownEdit" role="button" data-bs-toggle="dropdown" aria-expanded="false">Изменить</a>
+          {% else %}
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownEdit" role="button" data-bs-toggle="dropdown" aria-expanded="false">Изменить</a>
+          {% endif %}
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdownEdit">
+            {% if perms.dbadmin.edit_directory %}
+            {% if frompage == 'edit_directory' %}
+            <li><a class="dropdown-item active" href="{% url 'dbadmin:edit' 'directory' %}">Дирекцию</a></li>
+            {% else %}
+            <li><a class="dropdown-item" href="{% url 'dbadmin:edit' 'directory' %}">Дирекцию</a></li>
+            {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.edit_department %}
+            {% if frompage == 'edit_department' %}
+            <li><a class="dropdown-item active" href="{% url 'dbadmin:edit' 'department' %}">Департамент</a></li>
+            {% else %}
+            <li><a class="dropdown-item" href="{% url 'dbadmin:edit' 'department' %}">Департамент</a></li>
+            {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.edit_service %}
+            {% if frompage == 'edit_service' %}
+            <li><a class="dropdown-item active" href="{% url 'dbadmin:edit' 'service' %}">Службу/Направление/Управление</a></li>
+            {% else %}
+            <li><a class="dropdown-item" href="{% url 'dbadmin:edit' 'service' %}">Службу/Направление/Управление</a></li>
+            {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.edit_branch %}
+            {% if frompage == 'edit_branch' %}
+            <li><a class="dropdown-item active" href="{% url 'dbadmin:edit' 'branch' %}">Отдел</a></li>
+            {% else %}
+            <li><a class="dropdown-item" href="{% url 'dbadmin:edit' 'branch' %}">Отдел</a></li>
+            {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.edit_position %}
+            {% if frompage == 'edit_position' %}
+            <li><a class="dropdown-item active" href="{% url 'dbadmin:edit' 'position' %}">Должность</a></li>
+            {% else %}
+            <li><a class="dropdown-item" href="{% url 'dbadmin:edit' 'position' %}">Должность</a></li>
+            {% endif %}
+            {% endif %}
+          </ul>
+        </li>
+        {% endif %}
+        {% if perms.dbadmin.search_worker %}
         <li class="nav-item">
           {% if frompage == 'search' %}
               <a class="nav-link active" href="{% url 'dbadmin:search' %}">Поиск сотрудника</a>
@@ -88,8 +168,41 @@
               <a class="nav-link" href="{% url 'dbadmin:search' %}">Поиск сотрудника</a>
           {% endif %}
         </li>
+        {% endif %}
+        {% if perms.dbadmin.add_group or perms.dbadmin.edit_group or perms.dbadmin.delete_group %}
+        <li class="nav-item dropdown">
+          {% if frompage|startswith:'group' %}
+          <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownGroup" role="button" data-bs-toggle="dropdown" aria-expanded="false">Группы привилегий</a>
+          {% else %}
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownGroup" role="button" data-bs-toggle="dropdown" aria-expanded="false">Группы привилегий</a>
+          {% endif %}
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdownGroup">
+            {% if perms.dbadmin.add_group %}
+            {% if frompage == 'group_add' %}
+            <li><a class="dropdown-item active" href="{% url 'dbadmin:group_add' %}">Добавить</a></li>
+            {% else %}
+            <li><a class="dropdown-item" href="{% url 'dbadmin:group_add' %}">Добавить</a></li>
+            {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.delete_group %}
+            {% if frompage == 'group_delete' %}
+            <li><a class="dropdown-item active" href="{% url 'dbadmin:group_delete' %}">Удалить</a></li>
+            {% else %}
+            <li><a class="dropdown-item" href="{% url 'dbadmin:group_delete' %}">Удалить</a></li>
+            {% endif %}
+            {% endif %}
+            {% if perms.dbadmin.edit_group %}
+            {% if frompage == 'group_edit' %}
+            <li><a class="dropdown-item active" href="{% url 'dbadmin:group_edit' %}">Редактировать</a></li>
+            {% else %}
+            <li><a class="dropdown-item" href="{% url 'dbadmin:group_edit' %}">Редактировать</a></li>
+            {% endif %}
+            {% endif %}
+          </ul>
+        </li>
+        {% endif %}
       </ul>
-      <ul class="nav navbar-nav mx-5 my-auto w-100 justify-content-end">
+      <ul class="nav navbar-nav mx-5 my-auto w-50 justify-content-end">
         <li class="nav-item">
            <a class="nav-link" href="{% url 'dbadmin:logout' %}">Выход</a>
         </li>

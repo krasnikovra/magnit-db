@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "dbadmin/bootstrapcss.html" %}
+    {% include "dbadmin/bootstrap-selectcss.html" %}
+    <title>Изменить группу</title>
+  </head>
+  <body>
+    {% include "dbadmin/navbar.html" with frompage="group_edit" %}
+    <form action="{% url 'dbadmin:group_edit_save' %}" method="post">
+      {% csrf_token %}
+      <div class="w-50">
+        <!-- Id of group being edit -->
+        <div class="p-6 my-3 mx-5">
+            <div class="mx-auto my-2" style="text-align:left">Название группы</div>
+            <select class="selectpicker" data-width="100%" data-live-search="true" data-live-search-placeholder="Поиск" 
+            data-none-selected-text="Не выбрано" data-container="cont"
+            data-none-results-text="Ничего не найдено" data-selected-text-format="values" data-style="" data-style-base="form-control" name="group_id" id="group_id">
+                  {% for group in groups %}
+                      <option value="{{ group.id }}">{{ group.name }}</option>
+                  {% endfor %}
+            </select>
+        </div>
+        <!-- New group parameters -->
+        <div class="p-6 my-3 mx-5">
+          <label for="input" class="form-label">Новое название группы</label>
+          <input type="text" class="form-control" placeholder="Введите новое название группы" name="name" id="name">
+        </div>
+        <div class="p-6 my-3 mx-5">
+          <label for="perm_list" class="form-label">Укажите новые привилегии группы</label>
+          <ul class="list-group list-group-flush">
+          {% for model, permissions in model_permissions %}
+            <li class="list-group-item">
+                <label for="list{{ forloop.counter }}">{{ model }}</label>
+                <ul class="list-group ms-5 my-3" id="list{{ forloop.counter }}" name="list{{ forloop.counter }}">
+                {% for perm in permissions %}
+                <li class="list-group-item">
+                    <input type="checkbox" value="{{ perm.pk }}" id="perm_id_{{ perm_pk }}" name="perm_id">
+                    <label for="perm_id_{{ perm_pk }}">{{ perm.name }}</label>
+                </li>
+                {% endfor %}
+                </ul>
+            </li>
+          {% endfor %}
+          </ul>
+        </div>
+        <div class="сontainer mx-5">
+          <div class="row align-items-center">
+            <div class="col-md-auto">
+              <button type="submit" class="btn btn-primary my-auto">Изменить</button>
+            </div>
+            {% if msg %}
+            <div class="col">
+              <span class="mx-3 my-auto {% if err %} text-danger {% else %} text-success {% endif %}">{{ msg }}</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </form>
+    {% include "dbadmin/jquery.html" %}
+    {% include "dbadmin/bootstrapjs.html" %}
+    {% include "dbadmin/bootstrap-selectjs.html" %}
+  </body>
+</html>

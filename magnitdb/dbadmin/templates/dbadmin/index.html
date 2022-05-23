@@ -1,12 +1,62 @@
+{% load index %}
 <!DOCTYPE html>
 <html>
   <head>
     {% include "dbadmin/bootstrapcss.html" %}
-    <title>Администратор</title>
+    <title>База данных</title>
   </head>
   <body>
-    {% include "dbadmin/bootstrapjs.html" with frompage="download" %}
     {% include "dbadmin/navbar.html" with frompage="index" %}
-    This is some index.
+    <h1 class="mx-5 mb-3">
+      Вы вошли как {{ request.user.worker.full_name }}.
+    </h1>
+    <div class="content mx-5">
+      <table class="table table-bordered w-50">
+        <tr><th scope="row">ID:</th><td class="col-md-6"> {{ request.user.worker.id }}</td></tr>
+        <tr><th scope="row">ФИО:</th><td class="col-md-6"> {{ request.user.worker.full_name }}</td></tr>
+        <tr><th scope="row">Номер рабочего телефона:</th><td class="col-md-4"> <span id="work_phone">{{ request.user.worker.work_phone }}</span>
+           <button class="btn btn-primary ms-5" onclick="copyToClipboard('#work_phone', '#work_phone_btn')" id="work_phone_btn"> Скопировать </button></td></tr>
+        <tr><th scope="row">Номер сотового телефона:</th><td  class="col-md-4"> <span id="cell_phone">{{ request.user.worker.cell_phone }}</span>
+           <button class="btn btn-primary ms-5" onclick="copyToClipboard('#cell_phone', '#cell_phone_btn')" id="cell_phone_btn"> Скопировать </button></td></tr>
+        {% for row in desc %}
+        <tr><th scope="row">{{ row|index:0 }}:</th><td> {{ row|index:1 }}</td></tr>
+        {% endfor %}
+        <tr><th scope="row">Группы привилегий:</th><td>
+          {% if request.user.groups.all %}
+          <ul>
+            {% for group in request.user.groups.all %}
+            <li><a href="{% url 'dbadmin:group' group.id %}">{{ group.name }}</a></li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          Нет групп привилегий
+          {% endif %}
+        </td></tr>
+      </table>
+    </div>
+    {% include "dbadmin/jquery.html" %}
+    {% include "dbadmin/bootstrapjs.html" %}
+    <script>
+      function copyToClipboard(element, button) {
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($(element).text()).select();
+        document.execCommand("copy");
+        $temp.remove();
+
+        var $btn = $(button);
+        $btn.removeClass('btn-primary');
+        $btn.addClass('btn-success');
+        $btn.text('Скопировано');
+        $btn.prop('disabled', true);
+
+        setTimeout(function(){
+          $btn.removeClass('btn-success');
+          $btn.addClass('btn-primary');
+          $btn.text('Скопировать');
+          $btn.prop('disabled', false);
+        }, 1000)
+      }
+    </script>
   </body>
 </html>
